@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Bench — Discover Your Next Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F5EFE0;
+    --sand-dark: #E8DCC8;
+    --forest: #1A3A2A;
+    --forest-mid: #2D5A3D;
+    --forest-light: #4A8A5A;
+    --gold: #C8972A;
+    --gold-light: #E8B84B;
+    --cream: #FDFAF4;
+    --text-dark: #1A1A16;
+    --text-mid: #4A4A3A;
+    --text-light: #8A8A7A;
+    --sky: #E8F4F0;
+    --card-border: rgba(26,58,42,0.12);
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(253,250,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 2.5rem;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 900;
+    color: var(--forest);
+    letter-spacing: -0.5px;
+  }
+
+  .nav-logo .snake-icon {
+    width: 36px; height: 36px;
+    background: var(--forest);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+
+  .nav-link {
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--text-mid); text-decoration: none;
+    cursor: pointer; transition: color 0.2s;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--forest); }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .btn-ghost {
+    padding: 8px 18px; border-radius: 100px;
+    border: 1.5px solid var(--forest);
+    background: transparent; color: var(--forest);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-ghost:hover { background: var(--forest); color: #fff; }
+
+  .btn-primary {
+    padding: 8px 20px; border-radius: 100px;
+    border: none; background: var(--forest);
+    color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--forest-mid); transform: translateY(-1px); }
+
+  .user-badge {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; font-weight: 600; color: var(--forest);
+  }
+
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--forest-mid);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.8rem; font-weight: 700;
+  }
+
+  /* ─── PAGES ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--forest);
+    padding: 5rem 2.5rem 6rem;
+    position: relative; overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(200,151,42,0.25);
+    color: var(--gold-light);
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px; border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 900; color: var(--sand);
+    line-height: 1.1; margin-bottom: 1.2rem;
+    max-width: 700px;
+  }
+
+  .hero h1 em { color: var(--gold-light); font-style: normal; }
+
+  .hero p {
+    font-size: 1.1rem; color: rgba(245,239,224,0.7);
+    max-width: 500px; line-height: 1.7; margin-bottom: 2.5rem;
+  }
+
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn-hero {
+    padding: 14px 30px; border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s;
+    border: none;
+  }
+
+  .btn-hero-primary { background: var(--gold); color: #fff; }
+  .btn-hero-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  .btn-hero-outline {
+    background: transparent;
+    border: 2px solid rgba(245,239,224,0.4);
+    color: var(--sand);
+  }
+  .btn-hero-outline:hover { border-color: var(--sand); background: rgba(245,239,224,0.08); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(245,239,224,0.12);
+  }
+
+  .stat-item { color: var(--sand); }
+  .stat-item .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--gold-light);
+  }
+  .stat-item .label {
+    font-size: 0.8rem; color: rgba(245,239,224,0.5);
+    font-weight: 400; margin-top: 2px;
+  }
+
+  /* ─── SECTION ─── */
+  .section { padding: 4rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  .section-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; font-weight: 700; color: var(--forest);
+    line-height: 1.2;
+  }
+
+  .section-sub {
+    font-size: 0.9rem; color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  /* ─── CATEGORIES ─── */
+  .cat-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .cat-tab {
+    padding: 8px 18px; border-radius: 100px;
+    border: 1.5px solid var(--card-border);
+    background: #fff; color: var(--text-mid);
+    font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .cat-tab:hover, .cat-tab.active {
+    background: var(--forest); color: #fff; border-color: var(--forest);
+  }
+
+  /* ─── BOARD CARDS ─── */
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .post-card {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    cursor: pointer;
+  }
+  .post-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(26,58,42,0.1); }
+
+  .card-img {
+    height: 180px;
+    position: relative; overflow: hidden;
+  }
+
+  .card-img-bg {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .card-type-badge {
+    position: absolute; top: 12px; left: 12px;
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-visit { background: var(--gold); color: #fff; }
+  .badge-fly { background: var(--forest); color: #fff; }
+
+  .card-likes {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(253,250,244,0.92);
+    border-radius: 100px; padding: 4px 10px;
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.78rem; font-weight: 600; color: var(--forest);
+    cursor: pointer;
+  }
+
+  .card-body { padding: 1rem 1.2rem 1.2rem; }
+
+  .card-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .card-meta .dot { color: var(--card-border); }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--forest); margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.83rem; color: var(--text-mid);
+    line-height: 1.6; margin-bottom: 12px;
+  }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 10px; border-top: 1px solid var(--card-border);
+  }
+
+  .author-row {
+    display: flex; align-items: center; gap: 7px;
+  }
+
+  .author-ava {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+  }
+
+  .author-name { font-size: 0.8rem; font-weight: 500; color: var(--text-mid); }
+
+  .card-comments {
+    font-size: 0.78rem; color: var(--text-light);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ─── FAB ─── */
+  .fab {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--gold); border: none; color: #fff;
+    font-size: 1.6rem; font-weight: 300;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(200,151,42,0.4);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fab:hover { background: var(--gold-light); transform: scale(1.08); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(26,58,42,0.45);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #fff;
+    border-radius: 20px;
+    width: 100%; max-width: 440px;
+    padding: 2.5rem;
+    animation: slideUp 0.3s ease;
+    position: relative;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--sand); border: none;
+    width: 30px; height: 30px; border-radius: 50%;
+    cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-mid);
+  }
+
+  .modal-logo {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-logo-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--forest);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .modal-logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 900; color: var(--forest);
+  }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem; font-weight: 700; color: var(--forest);
+    margin-bottom: 4px;
+  }
+
+  .modal .subtitle {
+    font-size: 0.88rem; color: var(--text-light);
+    margin-bottom: 1.8rem;
+  }
+
+  .form-group { margin-bottom: 1rem; }
+
+  .form-label {
+    display: block; font-size: 0.8rem; font-weight: 600;
+    color: var(--text-mid); margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .form-input {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; color: var(--text-dark);
+    background: #fff; outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--forest); }
+
+  .form-input::placeholder { color: var(--text-light); }
+
+  textarea.form-input { resize: vertical; min-height: 90px; }
+
+  .form-select {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; color: var(--text-dark);
+    background: #fff; outline: none;
+    appearance: none; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .form-select:focus { border-color: var(--forest); }
+
+  .btn-full {
+    width: 100%; padding: 13px;
+    border-radius: 100px; border: none;
+    background: var(--forest); color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; margin-top: 4px;
+  }
+  .btn-full:hover { background: var(--forest-mid); }
+
+  .modal-switch {
+    text-align: center; margin-top: 1.2rem;
+    font-size: 0.85rem; color: var(--text-light);
+  }
+  .modal-switch a {
+    color: var(--forest); font-weight: 600;
+    cursor: pointer; text-decoration: none;
+  }
+  .modal-switch a:hover { text-decoration: underline; }
+
+  .error-msg {
+    font-size: 0.8rem; color: #c0392b;
+    margin-top: 6px; display: none;
+  }
+
+  /* ─── DESTINATION CARDS ─── */
+  .dest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 4rem;
+  }
+
+  .dest-card {
+    background: var(--forest);
+    border-radius: var(--radius);
+    overflow: hidden; position: relative;
+    height: 200px; cursor: pointer;
+    transition: transform 0.25s;
+  }
+  .dest-card:hover { transform: scale(1.02); }
+
+  .dest-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(26,58,42,0.9) 0%, transparent 60%);
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 1.2rem;
+  }
+
+  .dest-emoji { font-size: 2rem; margin-bottom: 4px; }
+  .dest-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700; color: #fff;
+  }
+  .dest-count { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--text-light);
+  }
+  .empty-state .es-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; color: var(--text-mid);
+    margin-bottom: 8px;
+  }
+
+  /* ─── POST MODAL ─── */
+  .post-modal .modal { max-width: 500px; }
+
+  .type-toggle {
+    display: flex; gap: 8px; margin-bottom: 1rem;
+  }
+
+  .type-btn {
+    flex: 1; padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--sand-dark);
+    background: #fff; color: var(--text-mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center;
+  }
+  .type-btn.active.visit { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .type-btn.active.fly { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 5rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--forest); color: #fff;
+    padding: 12px 24px; border-radius: 100px;
+    font-size: 0.88rem; font-weight: 500;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s; z-index: 500;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* card image patterns */
+  .img-pattern {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.5rem;
+  }
+  .p1 { background: linear-gradient(135deg, #B5E8C0 0%, #4A8A5A 100%); }
+  .p2 { background: linear-gradient(135deg, #B5D4F4 0%, #185FA5 100%); }
+  .p3 { background: linear-gradient(135deg, #FAC775 0%, #BA7517 100%); }
+  .p4 { background: linear-gradient(135deg, #F5C4B3 0%, #D85A30 100%); }
+  .p5 { background: linear-gradient(135deg, #CECBF6 0%, #7F77DD 100%); }
+  .p6 { background: linear-gradient(135deg, #9FE1CB 0%, #1D9E75 100%); }
+
+.btn-primary:hover {
+  background: var(--forest-mid);
+  transform: translateY(-1px);
+}
+
+  /* responsive */
+  @media (max-width: 640px) {
+    nav { padding: 0 1rem; }
+    .hero { padding: 3rem 1rem 4rem; }
+    .section { padding: 2rem 1rem; }
+    .nav-links { display: none; }
+    .hero-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="snake-icon">🐍</div>
+    Snake Bench
+  </div>
+
+  <div class="nav-links">
+    <span class="nav-link active" onclick="setActiveNav(this); showPage('home')">Главная</span>
+    <span class="nav-link" onclick="setActiveNav(this); showPage('board')">Лента</span>
+    <span class="nav-link" onclick="setActiveNav(this); showPage('destinations')">Направления</span>
+    <span class="nav-link" onclick="setActiveNav(this); showPage('about')">О нас</span>
+  </div>
+
+  <div class="nav-actions" id="navActions">
+
+  <button class="btn-ghost" onclick="openModal('loginModal')">Вход</button>
+  <button class="btn-primary" onclick="openModal('registerModal')">Регистрация</button>
+</div>
+</nav>
+
+
+
+<!-- ── HOME PAGE ── -->
+<div class="page active" id="page-home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">✦ Совет по туризму сообщества</div>
+      <h1>Найди свое следующие<br><em>место назначения</em></h1>
+      <p>Присоединяйтесь к тысячам исследователей, которые делятся историями о скрытых жемчужинах, полетах мечты и тайных уголках по всему миру.</p>
+      <div class="hero-actions">
+        <button class="btn-hero btn-hero-primary" onclick="showPage('board'); setActiveNav(document.querySelectorAll('.nav-link')[1])">Изучать ленту</button>
+        <button class="btn-hero btn-hero-outline" onclick="openModal('registerModal')">Делись местами</button>
+      </div>
+      <div class="hero-stats">
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Trending Destinations -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title"></div>
+        <div class="section-sub"></div>
+      </div>
+    </div>
+
+    
+
+    <!-- Recent board preview -->
+    <div class="section-header">
+      <div>
+        <div class="section-title">Последние новости</div>
+        <div class="section-sub">Свежие сообщения из нашего сообщества</div>
+      </div>
+      <button class="btn-ghost" style="font-size:0.82rem"
+onclick="showPage('board'); setActiveNav(document.querySelectorAll('.nav-link')[1])">
+Посмотреть все →
+</button>
+    </div>
+
+    <div class="board-grid" id="homePostsGrid"></div>
+  </div>
+</div>
+
+<!-- ── BOARD PAGE ── -->
+<div class="page" id="page-board">
+  <div class="section" style="max-width:1100px">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Лента</div>
+        <div class="section-sub">Откройте для себя места, которые стоит посетить, и направления для перелетов</div>
+      </div>
+      <button class="btn-primary" onclick="requireAuth(() => openModal('postModal'))">+ Новый пост</button>
+    </div>
+
+    <div class="cat-tabs">
+      <span class="cat-tab active" onclick="filterPosts('all', this)">🌍 Все места</span>
+      <span class="cat-tab" onclick="filterPosts('visit', this)">📍 Места для посещения</span>
+      <span class="cat-tab" onclick="filterPosts('fly', this)">✈️ Места, куда можно слетать</span>
+    </div>
+
+    <div class="board-grid" id="boardGrid"></div>
+  </div>
+</div>
+<!-- ── DESTINATIONS PAGE ── -->
+<div class="page" id="page-destinations">
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Популярные направления</div>
+        <div class="section-sub">Изучайте популярные места, рекомендованные сообществом</div>
+      </div>
+    </div>
+
+    <div class="dest-grid">
+      <div class="dest-card" onclick="openDestination('Москва')">
+        <div class="dest-card-overlay">
+          <div class="dest-emoji">🏝️</div>
+          <div class="dest-name">Москва</div>
+          <div class="dest-count">К постам</div>
+        </div>
+      </div>
+
+      <div class="dest-card" onclick="openDestination('Красноярск')">
+        <div class="dest-card-overlay">
+          <div class="dest-emoji">🏔️</div>
+          <div class="dest-name">Красноярск</div>
+          <div class="dest-count">К постам</div>
+        </div>
+      </div>
+
+      <div class="dest-card" onclick="openDestination('Санкт-Петербург')">
+        <div class="dest-card-overlay">
+          <div class="dest-emoji">🌊</div>
+          <div class="dest-name">Санкт-Петербург</div>
+          <div class="dest-count">К постам</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ABOUT PAGE ── -->
+<div class="page" id="page-about">
+  <div class="section" style="max-width:800px">
+    <div class="section-header">
+      <div>
+        <div class="section-title">О Snake Bench</div>
+        <div class="section-sub">Лента для путешествий, созданная для исследователей</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;padding:2rem;border-radius:16px;border:1px solid rgba(0,0,0,0.08);line-height:1.8">
+      <p>
+        Snake Bench — это современное туристическое сообщество, где люди делятся информацией о скрытых от глаз направлениях, дешевых перелетах,
+        незабываемых местах и вдохновляющих путешествиях.
+      </p>
+
+      <br>
+
+      <p>
+        Созданый для искателей приключений, которым мало обычных туристических путеводителей.
+      </p>
+
+      <br>
+
+      <p>
+        🌍 Открывайте для себя новые места<br>
+        ✈️ Делитесь идеями для путешествий<br>
+        🏔️ Вдохновляйте других путешественников
+      </p>
+    </div>
+  </div>
+</div>
+<!-- ── FLOATING ACTION BUTTON ── -->
+<button class="fab" onclick="requireAuth(() => openModal('postModal'))" title="Add a post">+</button>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-logo">
+      <div class="modal-logo-icon">🐍</div>
+      <span class="modal-logo-name">Snake Bench</span>
+    </div>
+    <h2>С возвращением</h2>
+    <p class="subtitle">Войдите в свою учетную запись</p>
+    <div class="form-group">
+      <label class="form-label">Адрес электронной почты</label>
+      <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" id="loginPass" placeholder="Пароль">
+    </div>
+    <div class="error-msg" id="loginError">Неверный адрес электронной почты или пароль.</div>
+    <button class="btn-full" onclick="doLogin()">Вход</button>
+    <div class="modal-switch">
+      У вас нет аккаунта? <a onclick="switchModal('loginModal','registerModal')">Регистрация</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── REGISTER MODAL ── -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    <div class="modal-logo">
+      <div class="modal-logo-icon">🐍</div>
+      <span class="modal-logo-name">Snake Bench</span>
+    </div>
+    <h2>Создать аккаунт</h2>
+    <p class="subtitle">Присоединяйтесь к сообществу исследователей</p>
+    <div class="form-group">
+      <label class="form-label">Имя</label>
+      <input type="text" class="form-input" id="regName" placeholder="Имя">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Адрес электронной почты</label>
+      <input type="email" class="form-input" id="regEmail" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" id="regPass" placeholder="Мин. 6 символов">
+    </div>
+    <div class="error-msg" id="regError">Пожалуйста, заполните все поля правильно.</div>
+    <button class="btn-full" onclick="doRegister()">Создать Аккаунт</button>
+    <div class="modal-switch">
+      Уже являетесь членом клуба? <a onclick="switchModal('registerModal','loginModal')">Вход</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── POST MODAL ── -->
+<div class="modal-overlay post-modal" id="postModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+    <h2>Share a place</h2>
+    <p class="subtitle" style="margin-bottom:1.2rem">Tell the community about somewhere amazing</p>
+
+    <div class="type-toggle">
+      <button class="type-btn active visit" id="typeVisit" onclick="setType('visit')">📍 Place to Visit</button>
+      <button class="type-btn fly" id="typeFly" onclick="setType('fly')">✈️ Place to Fly</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Destination name</label>
+      <input type="text" class="form-input" id="postTitle" placeholder="e.g. Secret waterfall in Costa Rica">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Country / Region</label>
+      <input type="text" class="form-input" id="postCountry" placeholder="e.g. Costa Rica">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tell us about it</label>
+      <textarea class="form-input" id="postDesc" placeholder="What makes this place special? Any tips for travelers?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Best time to visit</label>
+      <select class="form-select" id="postSeason">
+        <option value="">Select a season</option>
+        <option>Spring (Mar–May)</option>
+        <option>Summer (Jun–Aug)</option>
+        <option>Autumn (Sep–Nov)</option>
+        <option>Winter (Dec–Feb)</option>
+        <option>Year-round</option>
+      </select>
+    </div>
+    <div class="error-msg" id="postError">Please fill in all required fields.</div>
+    <button class="btn-full" onclick="doPost()">Publish Post</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ── STATE ──
+let currentUser = null;
+let currentFilter = 'all';
+let postType = 'visit';
+
+const USERS_KEY = 'sb_users';
+const POSTS_KEY = 'sb_posts';
+const COLORS = ['#1A3A2A','#185FA5','#BA7517','#7F77DD','#D85A30','#1D9E75','#993556','#3A3A3A'];
+const PATTERNS = ['p1','p2','p3','p4','p5','p6'];
+const EMOJIS = {
+  visit: ['🏞️','🏝️','🏔️','🌋','🏜️','🌊','🌿','🗿','🏛️','⛰️'],
+  fly: ['✈️','🛫','🌐','🗺️','🛬','🌍','🏙️','🛩️']
+};
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch { return []; }
+}
+
+
+// ── AUTH ──
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const users = getUsers();
+  const user = users.find(u => u.email === email && u.password === pass);
+  if (!user) {
+    document.getElementById('loginError').style.display = 'block'; return;
+  }
+  document.getElementById('loginError').style.display = 'none';
+  setUser(user);
+  closeModal('loginModal');
+  showToast('Welcome back, ' + user.name.split(' ')[0] + '! 🌍');
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const err = document.getElementById('regError');
+  if (!name || !email || pass.length < 6) { err.style.display = 'block'; return; }
+  const users = getUsers();
+  if (users.find(u => u.email === email)) {
+    err.textContent = 'Email already registered.'; err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  const user = { id: Date.now(), name, email, password: pass, color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+  users.push(user); saveUsers(users);
+  setUser(user);
+  closeModal('registerModal');
+  showToast('Welcome to Snake Bench, ' + name.split(' ')[0] + '! 🐍');
+}
+
+function setUser(user) {
+  currentUser = user;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('navActions').innerHTML = `
+    <div class="user-badge">
+      <div class="avatar" style="background:${user.color}">${initials}</div>
+      <span>${user.name.split(' ')[0]}</span>
+    </div>
+    <button class="btn-ghost" onclick="doLogout()">Log out</button>
+  `;
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem(SESSION_KEY);
+
+  document.getElementById('navActions').innerHTML = `
+    <button class="btn-ghost" onclick="openModal('loginModal')">Sign In</button>
+    <button class="btn-primary" onclick="openModal('registerModal')">Join Free</button>
+  `;
+
+  showToast('See you soon! 👋');
+}
+function requireAuth(fn) {
+  if (!currentUser) { openModal('loginModal'); return; }
+  fn();
+}
+
+// ── POSTS ──
+function setType(t) {
+  postType = t;
+  document.getElementById('typeVisit').className = 'type-btn' + (t === 'visit' ? ' active visit' : '');
+  document.getElementById('typeFly').className = 'type-btn' + (t === 'fly' ? ' active fly' : '');
+}
+
+function doPost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const country = document.getElementById('postCountry').value.trim();
+  const desc = document.getElementById('postDesc').value.trim();
+  const season = document.getElementById('postSeason').value;
+  const err = document.getElementById('postError');
+  if (!title || !country || !desc || !season) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+
+  const posts = getPosts();
+  const emojiList = EMOJIS[postType];
+  const newPost = {
+    id: Date.now(), type: postType, title, country, desc, season,
+    author: currentUser.name,
+    authorColor: currentUser.color,
+    likes: 0, likedBy: [], comments: 0,
+    emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
+    pattern: PATTERNS[Math.floor(Math.random() * PATTERNS.length)],
+    date: 'just now'
+  };
+  posts.unshift(newPost);
+  savePosts(posts);
+
+  closeModal('postModal');
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postCountry').value = '';
+  document.getElementById('postDesc').value = '';
+  document.getElementById('postSeason').value = '';
+
+  renderBoard();
+  renderHomePosts();
+  showToast('Post published! 🎉');
+  showPage('board');
+}
+
+function toggleLike(postId) {
+  if (!currentUser) { openModal('loginModal'); return; }
+  const posts = getPosts();
+  const post = posts.find(p => p.id == postId);
+  if (!post) return;
+  const idx = post.likedBy.indexOf(currentUser.id);
+  if (idx === -1) { post.likedBy.push(currentUser.id); post.likes++; }
+  else { post.likedBy.splice(idx, 1); post.likes--; }
+  savePosts(posts);
+  renderBoard();
+  renderHomePosts();
+}
+
+function filterPosts(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderBoard();
+}
+
+function getInitials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+}
+
+function makeCard(post) {
+  const liked = currentUser && post.likedBy.includes(currentUser.id);
+  return `
+    <div class="post-card">
+      <div class="card-img">
+        <div class="img-pattern ${post.pattern}">${post.emoji}</div>
+        <span class="card-type-badge ${post.type === 'visit' ? 'badge-visit' : 'badge-fly'}">
+          ${post.type === 'visit' ? '📍 Visit' : '✈️ Fly to'}
+        </span>
+        <span class="card-likes" onclick="event.stopPropagation(); toggleLike(${post.id})">
+          ${liked ? '❤️' : '🤍'} ${post.likes}
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span>📍 ${post.country}</span>
+          <span class="dot">·</span>
+          <span>🗓️ ${post.season || 'Any time'}</span>
+          <span class="dot">·</span>
+          <span>${post.date}</span>
+        </div>
+        <div class="card-title">${post.title}</div>
+        <div class="card-desc">${post.desc.length > 110 ? post.desc.slice(0,110) + '…' : post.desc}</div>
+        <div class="card-footer">
+          <div class="author-row">
+            <div class="author-ava" style="background:${post.authorColor}">${getInitials(post.author)}</div>
+            <span class="author-name">${post.author}</span>
+          </div>
+          <span class="card-comments">💬 ${post.comments}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderBoard() {
+  const posts = getPosts();
+  const filtered = currentFilter === 'all' ? posts : posts.filter(p => p.type === currentFilter);
+  const grid = document.getElementById('boardGrid');
+  if (!grid) return;
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="es-icon">🌍</div>
+      <h3>No posts yet</h3>
+      <p>Be the first to share a place!</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(makeCard).join('');
+}
+
+function renderHomePosts() {
+  const posts = getPosts().slice(0, 3);
+  const grid = document.getElementById('homePostsGrid');
+  if (!grid) return;
+  grid.innerHTML = posts.map(makeCard).join('');
+}
+
+// ── PAGES ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'board') renderBoard();
+  if (id === 'home') renderHomePosts();
+}
+
+function setActiveNav(el) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── MODAL HELPERS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function switchModal(from, to) { closeModal(from); setTimeout(() => openModal(to), 150); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(this.id);
+  });
+});
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function restoreSession() {
+  try {
+    const user = JSON.parse(localStorage.getItem(SESSION_KEY));
+    if (user) {
+      setUser(user);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function openDestination(name) {
+  showPage('board');
+
+  document.querySelectorAll('.nav-link').forEach(l =>
+    l.classList.remove('active')
+  );
+
+  document.querySelectorAll('.nav-link')[1].classList.add('active');
+
+  const posts = getPosts();
+  const filtered = posts.filter(post =>
+    post.country.toLowerCase().includes(name.toLowerCase()) ||
+    post.title.toLowerCase().includes(name.toLowerCase())
+  );
+
+  const grid = document.getElementById('boardGrid');
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="es-icon">🌍</div>
+        <h3>No posts found</h3>
+        <p>Try adding a destination post.</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  grid.innerHTML = filtered.map(makeCard).join('');
+}
+document.addEventListener('keydown', function(e) {
+  const loginOpen = document.getElementById('loginModal').classList.contains('open');
+  const registerOpen = document.getElementById('registerModal').classList.contains('open');
+
+  if (e.key === 'Enter') {
+    if (loginOpen) doLogin();
+    if (registerOpen) doRegister();
+  }
+});
+// ── INIT ──
+restoreSession();
+renderHomePosts();
+renderBoard();
+</script>
+</body>
+</html>
